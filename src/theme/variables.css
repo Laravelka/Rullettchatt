@@ -481,9 +481,9 @@ ion-item {
 }
 
 .form-button {
-	padding: 12px;
+	padding: 14px 12px 0 12px;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: end;
 	align-items: end;
 }
 
@@ -493,4 +493,8 @@ ion-item {
 
 .item-style-bottom {
 	--border-radius: 0 0 10px 10px;
+}
+
+.mt-05 {
+	margin-top: .5rem;
 }

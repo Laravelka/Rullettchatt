@@ -1,4 +1,4 @@
-package ru.laravelka.rullettchatt;
+package ru.laravelka.rulettchatt;
 
 import com.getcapacitor.BridgeActivity;
 

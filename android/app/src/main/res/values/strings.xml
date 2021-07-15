@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Rullettchatt</string>
-    <string name="title_activity_main">Rullettchatt</string>
-    <string name="package_name">ru.laravelka.rullettchatt</string>
-    <string name="custom_url_scheme">ru.laravelka.rullettchatt</string>
+    <string name="app_name">Rulettchatt</string>
+    <string name="title_activity_main">Rulettchatt</string>
+    <string name="package_name">ru.laravelka.rulettchatt</string>
+    <string name="custom_url_scheme">ru.laravelka.rulettchatt</string>
 </resources>

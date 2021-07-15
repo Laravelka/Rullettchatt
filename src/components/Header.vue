@@ -3,15 +3,15 @@
 		<ion-toolbar>
 			<ion-buttons slot="start">
 				<template v-if="isCustomBack && !isNotBack">
-					<ion-button @click="goBack">
+					<ion-button color="theme" @click="goBack">
 						<ion-icon slot="icon-only" :icon="chevronBackOutline"></ion-icon>
 					</ion-button>
 				</template>
-				<ion-back-button v-else-if="!isCustomBack && !isNotBack"></ion-back-button>
-				<ion-menu-button v-else auto-hide="false"></ion-menu-button>
+				<ion-back-button color="theme" v-else-if="!isCustomBack && !isNotBack"></ion-back-button>
+				<ion-menu-button color="theme" v-else auto-hide="false"></ion-menu-button>
 			</ion-buttons>
 			<ion-buttons v-if="!isSettings" slot="primary">
-				<ion-button router-link="/settings">
+				<ion-button color="theme" router-link="/settings">
 					<ion-icon class="icon-25" :icon="settingsOutline"></ion-icon>
 				</ion-button>
 			</ion-buttons>

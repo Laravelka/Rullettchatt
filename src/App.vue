@@ -1,16 +1,17 @@
 <template>
 	<IonApp>
 		<IonSplitPane contentId="main-content" content-id="main-content">
-			<ion-menu contentId="main-content" content-id="main-content" type="push">
+			<ion-menu v-if="false" contentId="main-content" content-id="main-content" type="push">
 				<ion-content>
 					<ion-list id="inbox-list">
-						<ion-list-header>Имя пользователя</ion-list-header>
-						<ion-note>Осталось: 1 день и 13 часов</ion-note>
+						<ion-list-header>{{ user.name }}</ion-list-header>
+						<ion-note></ion-note>
 					</ion-list>
 				</ion-content>
 			</ion-menu>
 			<ion-router-outlet id="main-content"></ion-router-outlet>
 			<ion-modal
+				backdrop-dismiss="false"
 				css-class="auth-modal"
 				:is-open="isOpenRef"
 			>

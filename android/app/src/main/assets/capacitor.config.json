@@ -1,6 +1,6 @@
 {
-	"appId": "ru.laravelka.rullettchatt",
-	"appName": "Rullettchatt",
+	"appId": "ru.laravelka.rulettchatt",
+	"appName": "Rulettchatt",
 	"bundledWebRuntime": false,
 	"npmClient": "npm",
 	"webDir": "public",

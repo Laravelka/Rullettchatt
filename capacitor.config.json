@@ -1,21 +1,21 @@
 {
-  "appId": "ru.laravelka.rullettchatt",
-  "appName": "Rullettchatt",
-  "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "public",
-  "plugins": {
-    "SplashScreen": {
-      "launchAutoHide": false,
-      "backgroundColor": "#0A0A0A",
-      "androidScaleType": "CENTER_CROP",
-      "splashFullScreen": false,
-      "splashImmersive": false
+    "appId": "ru.laravelka.rulettchatt",
+    "appName": "Rulettchatt",
+    "bundledWebRuntime": false,
+    "npmClient": "npm",
+    "webDir": "public",
+    "plugins": {
+        "SplashScreen": {
+            "launchAutoHide": false,
+            "backgroundColor": "#0A0A0A",
+            "androidScaleType": "CENTER_CROP",
+            "splashFullScreen": false,
+            "splashImmersive": false
+        }
+    },
+    "cordova": {
+        "cordova-plugin-purchase": {
+            "BILLING_KEY": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5BkhnvuyIRpUH87YsF4r5ez05QouQ7e9/Y5QBMjl8RF1/bhgpbySX8W8uH6WjCz1QIeb603/nC2mMCsdY9IMzwwQ0eYvyi7t/6RX+Jl67ywlWIsZyxIOLqx/SXXIauk88u2+9Yzyt5CltQPpiZHnDcnAFCL4zCpfor1zV/RllzedPJ5kjmc6bO1JX+rUisYjxS1ajrw75oQi7BSdZ/SlcMB6zdy/o96DyR0E77KGWckv7mUPM69ld3dn42Rb4xiK4fzFNKTBZN2bknd/J9zxfPXrfwyhPk0Np6ybX1WXf2LeU/v+T+37o4oT6ZI688e5+9YgOy00yTO0VL5+BG6C4wIDAQAB"
+        }
     }
-  },
-  "cordova": {
-    "cordova-plugin-purchase": {
-      "BILLING_KEY": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5BkhnvuyIRpUH87YsF4r5ez05QouQ7e9/Y5QBMjl8RF1/bhgpbySX8W8uH6WjCz1QIeb603/nC2mMCsdY9IMzwwQ0eYvyi7t/6RX+Jl67ywlWIsZyxIOLqx/SXXIauk88u2+9Yzyt5CltQPpiZHnDcnAFCL4zCpfor1zV/RllzedPJ5kjmc6bO1JX+rUisYjxS1ajrw75oQi7BSdZ/SlcMB6zdy/o96DyR0E77KGWckv7mUPM69ld3dn42Rb4xiK4fzFNKTBZN2bknd/J9zxfPXrfwyhPk0Np6ybX1WXf2LeU/v+T+37o4oT6ZI688e5+9YgOy00yTO0VL5+BG6C4wIDAQAB"
-    }
-  }
 }
