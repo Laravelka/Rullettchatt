@@ -12,10 +12,12 @@
 				</ion-toolbar>
 			</ion-header>
 			<ion-grid>
-				<ion-row class="ion-text-center">
+				<ion-row class="ion-text-center" style="height: 90vh">
 					<ion-col>
 						<h1><ion-text color="danger">Упс, {{ errorRef.code }}</ion-text></h1>
 						<p class="text-muted">{{ errorRef.message }}</p>
+
+						<ion-button v-if="enableButton !== 0" color="danger" href="/" style="margin-top: 10px">На главную</ion-button>
 					</ion-col>
 				</ion-row>
 			</ion-grid>
@@ -34,6 +36,8 @@
 		IonToolbar,
 		IonTitle,
 		IonContent,
+		IonButton,
+
 	} from '@ionic/vue';
 	import { defineComponent, ref } from 'vue';
     import { useRoute } from 'vue-router';
@@ -50,11 +54,13 @@
 			IonHeader,
 			IonToolbar,
 			IonContent,
+			IonButton
 		},
         setup() {
             const errorRef = ref<any>({
                 code: 500,
-                message: 'Application error'
+                message: 'Application error',
+				enableButton: 0
             });
             errorRef.value = useRoute().params;
 

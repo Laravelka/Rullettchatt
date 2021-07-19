@@ -16,7 +16,7 @@
 			</ion-grid>
 			<ion-grid>
 				<ion-row>
-					<ion-col size-md="6" size-xs="12">
+					<ion-col size-lg="6" size-md="12" size-xs="12">
 						<div class="d-flex ion-justify-content-center">
 							<div class="video-container w-100">
 								<video
@@ -54,7 +54,7 @@
 							</ion-fab-button>
 						</div>
 					</ion-col>
-					<ion-col size-md="6" size-xs="12">
+					<ion-col size-lg="6" size-md="12" size-xs="12">
 						<div class="d-flex ion-justify-content-center mt-2">
 							<video
 								muted
@@ -145,6 +145,7 @@
 
 	import Header from '@/components/Header.vue';
 	import { useRouter } from 'vue-router';
+	import axios from 'axios';
 
 	export default defineComponent({
 		name: 'Folder',
@@ -171,7 +172,7 @@
 			const token = localStorage.getItem('token'),
 				isAuth = token !== null;
 
-			const socket = SocketIoClient('http://localhost:5000/', {
+			let socket = SocketIoClient(axios.defaults.headers.common['SiteUrl'], {
 				query: {
 					token: token
 				}
@@ -183,6 +184,10 @@
 				user.value = JSON.parse(getUser);
 			}
 			
+			const streamRef = ref<any>(null);
+
+			const setStream = (value: any) => streamRef.value = value;
+
 			const arrMessages = ref<any>([]);
 			const peerInstance = ref<any>(null);
 
@@ -210,19 +215,6 @@
 			const inputMessageRef = ref<string|null>(null);
 			const toastMessageRef = ref<string|null>(null);
 
-			function getAllFuncs(toCheck: any) {
-				let props: any = [];
-				let obj = toCheck;
-
-				do {
-					props = props.concat(Object.getOwnPropertyNames(obj));
-				} while ((obj = Object.getPrototypeOf(obj)));
-
-				return props.sort().filter(function(e: any, i: any, arr: any) {
-					if (e!=arr[i+1] && typeof toCheck[e] == 'function') return true;
-				});
-			}
-
 			const onPlayStream = (event: any) => {
 				event.target.style.backgroundImage = 'none';
 			};
@@ -247,18 +239,24 @@
 			});
 
 			socket.on('errorMessage', (message: any) => {
-				isOpenToast.value = true;
-				toastColorRef.value = 'danger';
-				toastMessageRef.value = message.text;
+				if (message.type === 'auth_fail' && (getUser !== null || token !== null)) {
+					isOpenToast.value = true;
+					toastColorRef.value = 'danger';
+					toastMessageRef.value = message.text;
+				} else if (message.type !== 'auth_fail') {
+					isOpenToast.value = true;
+					toastColorRef.value = 'danger';
+					toastMessageRef.value = message.text;
+				}
 
 				setTimeout(async() => {
 					isOpenToast.value = false;
 					toastColorRef.value = 'primary';
 					toastMessageRef.value = null;
 
-					if (message.type == 'two_window') {
-						const info = await Device.getInfo();
+					const info = await Device.getInfo();
 
+					if (message.type == 'two_window') {
 						if (info.platform == 'android' || info.platform == 'ios') {
 							App.exitApp();
 						} else {
@@ -270,15 +268,33 @@
 								}
 							});
 						}
+					} else if (message.type == 'auth_fail') {
+						if (getUser !== null || token !== null) {
+							if (info.platform == 'android' || info.platform == 'ios') {
+								App.exitApp();
+							} else {
+								router.replace({
+									name: 'Error', 
+									params: {
+										code: 'ошибка',
+										message: 'Ошибка аутентификации',
+										enableButton: 1,
+									}
+								});
+							}
+							localStorage.removeItem('user');
+							localStorage.removeItem('token');
+						}
 					}
 				}, 3000);
 			});
 
 			const startStreaming = async() => {
-				const stream = await navigator.mediaDevices.getUserMedia({
+				setStream(await navigator.mediaDevices.getUserMedia({
 					audio: true,
 					video: true,
-				});
+				}));
+				const stream = streamRef.value;
 				const videoTracks = stream.getVideoTracks();
 				const peerClient = new WebRTCPeerClient(socket, {
 					stream: stream
@@ -443,8 +459,6 @@
 					socket.on('simple-signal[reject]', (data: any) => {
 						console.log('Звонок отклонен, т.к нет доступных пользователей', data);
 
-						// signal.value._closePeer(data.sessionId);
-
 						isCallRemote.value = false;
 						remoteUserId.value = null;
 
@@ -466,8 +480,14 @@
 			} else {
 				socket.on('login', (data: any) => {
 					user.value = data;
-
-					console.log('login', data);
+					
+					console.log('login:', data);
+					
+					socket = SocketIoClient(axios.defaults.headers.common['SiteUrl'], {
+						query: {
+							token: data.token
+						}
+					});	
 
 					startStreaming().then((result) => {
 						signal.value = result.signal;
@@ -475,8 +495,6 @@
 
 						socket.on('simple-signal[reject]', (data: any) => {
 							console.log('Звонок отклонен, т.к нет доступных пользователей', data);
-
-							// signal.value._closePeer(data.sessionId);
 
 							isCallRemote.value = false;
 							remoteUserId.value = null;
@@ -500,9 +518,7 @@
 			}
 
 			const sendMessage = () => {
-				if (remoteUserId.value === null) {
-					return;
-				}  else {
+				if (remoteUserId.value !== null) {
 					signal.value.sendMessage(remoteUserId.value, inputMessageRef.value);
 
 					arrMessages.value.push({
@@ -642,7 +658,87 @@
 		-ms-overflow-style: none;
 	}
 
-	@media (max-width: 575.98px) {
+	@media (min-width: 320px) {
+		.video-block {
+			height: 60vh;
+			max-height: 65vh;
+		}
+
+		.ios .video-block {
+			max-height: 60vh;
+		}
+
+		.video-block.locale {
+			display: none;
+		}
+
+		.video-block.locale-mini {
+			display: inline-block;
+			width: 130px!important;
+			height: 130px!important;
+			margin: 0;
+			border-radius: 0.5rem 0 .5rem;
+			position: absolute;
+			top: 4px;
+			left: 4px;
+		}
+
+		.fixed-on-mobile {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			left: 0;
+		}
+
+		ion-item.chat-bg {
+			width: 100%;
+			--min-height: 48px;
+			--background: var(--ion-color-light-shade)/*rgb(104 125 187 / 85%)*/!important;
+			--border-radius: .5rem .5rem 0 0!important;
+		}
+	}
+
+	@media (min-width: 360px) {
+		.video-block {
+			height: 65vh;
+			max-height: 70vh;
+		}
+
+		.ios .video-block {
+			max-height: 70vh;
+		}
+
+		.video-block.locale {
+			display: none;
+		}
+
+		.video-block.locale-mini {
+			display: inline-block;
+			width: 130px!important;
+			height: 130px!important;
+			margin: 0;
+			border-radius: 0.5rem 0 .5rem;
+			position: absolute;
+			top: 4px;
+			left: 4px;
+		}
+
+		.fixed-on-mobile {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			left: 0;
+		}
+
+		ion-item.chat-bg {
+			width: 100%;
+			--min-height: 48px;
+			--background: var(--ion-color-light-shade)/*rgb(104 125 187 / 85%)*/!important;
+			--border-radius: .5rem .5rem 0 0!important;
+		}
+	}
+
+	@media (min-width: 575.98px) {
 		.chat-messages {
 			margin-top: 0;
 			overflow-y: scroll;
@@ -660,8 +756,8 @@
 		}
 
 		.video-block {
-			height: 75vh;
-			max-height: 85vh;
+			height: 73vh;
+			max-height: 80vh;
 		}
 
 		.ios .video-block {
@@ -674,8 +770,8 @@
 
 		.video-block.locale-mini {
 			display: inline-block;
-			width: 160px;
-			height: 150px;
+			width: 200px!important;
+			height: 200px!important;
 			margin: 0;
 			border-radius: 0.5rem 0 .5rem;
 			position: absolute;
@@ -703,6 +799,86 @@
 
 		.my > .time {
 			color: #ffffff78;
+		}
+	}
+
+	@media (min-width: 768px) {
+		.video-block {
+			height: 75vh;
+			max-height: 85vh;
+		}
+
+		.ios .video-block {
+			max-height: 70vh;
+		}
+
+		.video-block.locale {
+			display: none;
+		}
+
+		.video-block.locale-mini {
+			display: inline-block;
+			width: 240px!important;
+			height: 240px!important;
+			margin: 0;
+			border-radius: 0.5rem 0 .5rem;
+			position: absolute;
+			top: 4px;
+			left: 4px;
+		}
+
+		.fixed-on-mobile {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			left: 0;
+		}
+
+		ion-item.chat-bg {
+			width: 100%;
+			--min-height: 48px;
+			--background: var(--ion-color-light-shade)/*rgb(104 125 187 / 85%)*/!important;
+			--border-radius: .5rem .5rem 0 0!important;
+		}
+	}
+
+	@media (min-width: 992px) {
+		.video-block {
+			height: 50vh;
+			max-height: 55vh;
+		}
+
+		.ios .video-block {
+			max-height: 55vh;
+		}
+
+		.video-block.locale {
+			display: block;
+		}
+
+		.video-block.locale-mini {
+			display: none;
+			width: 240px!important;
+			height: 240px!important;
+			margin: 0;
+			border-radius: 0.5rem 0 .5rem;
+			position: absolute;
+			top: 4px;
+			left: 4px;
+		}
+
+		.fixed-on-mobile {
+			position: relative;
+			bottom: 0;
+			width: 100%;
+			left: 0;
+		}
+
+		ion-item.chat-bg {
+			width: 100%;
+			--min-height: 48px;
+			--background: var(--ion-color-light-shade)/*rgb(104 125 187 / 85%)*/!important;
+			--border-radius: .5rem .5rem 0 0!important;
 		}
 	}
 
@@ -751,12 +927,12 @@
 		z-index: 1;
 		display: flex;
 		position: fixed;
-		bottom: 140px;
+		bottom: 210px;
 		left: 10px;		
 	}
 
 	ion-grid.container-messages.ios {
-		bottom: 150px;
+		bottom: 195px;
 		max-height: 140px;
 	}
 

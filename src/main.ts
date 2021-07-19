@@ -33,7 +33,9 @@ import './theme/variables.css';
 
 const token = localStorage.getItem('token') ?? false;
 
-axios.defaults.baseURL = 'http://localhost:5000/api/'; // "https://rulettchatt.ru/api/";
+axios.defaults.headers.common['SiteUrl'] = "http://localhost:5000/";
+
+axios.defaults.baseURL = axios.defaults.headers.common['SiteUrl'] + 'api/';
 axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
