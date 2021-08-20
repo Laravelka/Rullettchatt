@@ -348,12 +348,23 @@
 						const id = getRandomId(allIDs);
 						
 						if (id !== undefined) {
-							lastUserId.value = id;
+							lastUserId.value   = id;
+							arrMessages.value  = [];
 							remoteUserId.value = id;
 							isConnectRef.value = true;
 							isCallRemote.value = true;
-
+							
 							const { peer } = await peerClient.connect(id);
+							
+							peer.on('error', (err: any) => {
+								console.log('RTC Error:', err);
+							})
+
+							peer.on('data', (chunk: any) => {
+								const decoder = new TextDecoder("utf-8");
+
+								console.log('onDataDiscover: ', chunk, decoder.decode(chunk));
+							});
 
 							peerInstance.value = peer;
 
@@ -383,13 +394,24 @@
 						if (!remoteUserId.value) {
 							const { peer } = await request.accept();
 
+							peer.on('error', (err: any) => {
+								console.log('RTC Request Error:', err);
+							});
+
+							peer.on('data', (chunk: any) => {
+								const decoder = new TextDecoder("utf-8");
+
+								console.log('onDataRequest: ', chunk, decoder.decode(chunk));
+							});
+
 							peerInstance.value = peer;
 
 							peer.addStream(stream);
 
+							arrMessages.value  = [];
 							isConnectRef.value = true;
 							isCallRemote.value = true;
-							lastUserId.value = request.initiator;
+							lastUserId.value   = request.initiator;
 							remoteUserId.value = request.initiator;
 
 							peer.on('stream', (remoteStream: any) => {
@@ -526,6 +548,8 @@
 						text: inputMessageRef.value
 					});
 
+					peerInstance.value.write(inputMessageRef.value);
+
 					setTimeout(() => {
 						const element = document.getElementsByClassName('lastMessage')[0];
 						const elementMobile = document.getElementsByClassName('lastMessageMobile')[0];
@@ -625,8 +649,8 @@
 
 	.video-block {
 		background-image: linear-gradient(#999, #555);
-		height: 55vh;
-		max-height: 60vh;
+		height: calc(55vh - 80px);
+		max-height: calc(60vh - 80px);
 		border-radius: 0.5rem;
 		position: relative;
 		width: 100%;
@@ -660,8 +684,8 @@
 
 	@media (min-width: 320px) {
 		.video-block {
-			height: 60vh;
-			max-height: 65vh;
+			height: calc(60vh - 80px);
+			max-height: calc(65vh - 80px);
 		}
 
 		.ios .video-block {
@@ -700,8 +724,8 @@
 
 	@media (min-width: 360px) {
 		.video-block {
-			height: 65vh;
-			max-height: 70vh;
+			height: calc(65vh - 80px);
+			max-height: calc(70vh - 80px);
 		}
 
 		.ios .video-block {
@@ -756,8 +780,8 @@
 		}
 
 		.video-block {
-			height: 73vh;
-			max-height: 80vh;
+			height: calc(73vh - 80px);
+			max-height: calc(80vh - 80px);
 		}
 
 		.ios .video-block {
@@ -804,8 +828,8 @@
 
 	@media (min-width: 768px) {
 		.video-block {
-			height: 75vh;
-			max-height: 85vh;
+			height: calc(75vh - 80px);
+			max-height: calc(80vh - 80px);
 		}
 
 		.ios .video-block {
@@ -932,7 +956,7 @@
 	}
 
 	ion-grid.container-messages.ios {
-		bottom: 195px;
+		bottom: 255px;
 		max-height: 140px;
 	}
 
