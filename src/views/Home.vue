@@ -285,8 +285,8 @@
 					}
 
 					const peer = peerRef.value = new Peer(user.id, {
-						port: 5001,
-						host: 'localhost',
+						port: 5000,
+						host: 'https://rulettchatt.ru',
 						path: '/peerjs',
 						key: 'rullettchatt',
 						debug: 3,
