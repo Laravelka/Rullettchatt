@@ -134,7 +134,7 @@
 	} from 'ionicons/icons';
 	import { App } from '@capacitor/app';
 	import { Device } from '@capacitor/device';
-	import { defineComponent, ref } from 'vue';
+	import { defineComponent, onMounted, ref } from 'vue';
 	// import { InAppPurchase2 } from '@ionic-native/in-app-purchase-2';
 
 	// eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -146,6 +146,7 @@
 	import Header from '@/components/Header.vue';
 	import { useRouter } from 'vue-router';
 	import axios from 'axios';
+	import Peer from 'peerjs';
 
 	export default defineComponent({
 		name: 'Folder',
@@ -177,15 +178,47 @@
 					token: token
 				}
 			});	
-
 			const user = ref<any>({});
 
 			if (getUser !== null) {
 				user.value = JSON.parse(getUser);
 			}
 			
-			const streamRef = ref<any>(null);
+			const peer = new Peer(user.value.token, {
+				port: 5001,
+				host: 'localhost',
+				path: '/peerjs',
+				key: 'rullettchatt',
+			});
+			
+			peer.on('connection', (connection) => {
+				console.log("connected:", connection, peer.listAllPeers);
 
+				connection.on('data', (data) => {
+					// Will print 'hi!'
+					console.log("data: ", data);
+				});
+
+				connection.on('open', () => {
+					connection.send({
+						message: 'test',
+						users: [1, 2, 3]
+					});
+				});
+			});
+
+			peer.on('call', (call) => {
+				console.log('call:', call);
+
+				call.on('stream', function(stream) {
+					console.log('stream:', stream);
+
+					// `stream` is the MediaStream of the remote peer.
+					// Here you'd add it to an HTML video/canvas element.
+				});
+			});
+
+			const streamRef = ref<any>(null);
 			const setStream = (value: any) => streamRef.value = value;
 
 			const arrMessages = ref<any>([]);
@@ -239,6 +272,8 @@
 			});
 
 			socket.on('errorMessage', (message: any) => {
+				console.log(message);
+
 				if (message.type === 'auth_fail' && (getUser !== null || token !== null)) {
 					isOpenToast.value = true;
 					toastColorRef.value = 'danger';
@@ -303,15 +338,15 @@
 				if (videoTracks.length === 0) {
 					isOpenToast.value = true;
 					toastColorRef.value = 'danger';
-					toastMessageRef.value = 'Включите камеру или предоставьте доступ к ней.';
+					toastMessageRef.value = 'Включите камеру или предоставьте доступ к ней и перезапустите приложение/cайт.';
 
-					setTimeout(() => {
+					/*setTimeout(() => {
 						isOpenToast.value = false;
 						toastColorRef.value = 'primary';
 						toastMessageRef.value = null;
-					}, 4000);
+					}, 6000);*/
 				} else {
-					console.log(videoTracks[0].label);
+					console.log(videoTracks);
 
 					if (localVideo.value && localMiniVideo.value) {
 						if ('srcObject' in localVideo.value && 'srcObject' in localMiniVideo.value) {
@@ -385,7 +420,7 @@
 							setTimeout(() => {
 								isOpenToast.value = false;
 								toastColorRef.value = 'primary';
-								toastMessageRef.value = null;
+								toastMessageRef.value = '';
 							}, 3000);
 						}
 					});
@@ -562,7 +597,11 @@
 			};
 
 			const disconnect = () => {
+				signal.value.peers().forEach((peer: any) => {
+					peer.removeAllListeners('close');
+				});
 				peerInstance.value.destroy();
+				signal.value.dispatch();
 
 				remoteUserId.value = null;
 				isCallRemote.value = false;
@@ -579,6 +618,7 @@
 			const next = () => {
 				throttleButton();
 
+				signal.value.dispatch();
 				peerInstance.value.destroy();
 				signal.value.discover();
 

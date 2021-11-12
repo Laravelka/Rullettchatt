@@ -16,7 +16,7 @@
 				:is-open="isOpenRef"
 			>
 				<AuthModal
-					v-on:close-modal="closeModal"
+					v-on:close-modal="closeModal($event)"
 				></AuthModal>
 			</ion-modal>
 		</IonSplitPane>
@@ -24,10 +24,46 @@
 </template>
 
 <script lang="ts">
-	import { IonApp, IonModal, IonContent, IonList, IonListHeader, IonMenu, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
-	import { defineComponent, onMounted, ref } from 'vue';
+	import { 
+		getCurrentInstance, 
+		defineComponent, 
+		onMounted, 
+		ref,
+
+	} from 'vue';
+
 	import { useRoute } from 'vue-router';
-	import { archiveOutline, archiveSharp, bookmarkOutline, bookmarkSharp, heartOutline, heartSharp, mailOutline, mailSharp, paperPlaneOutline, paperPlaneSharp, trashOutline, trashSharp, warningOutline, warningSharp } from 'ionicons/icons';
+
+	import { 
+		IonApp, 
+		IonModal, 
+		IonContent, 
+		IonList, 
+		IonListHeader, 
+		IonMenu, 
+		IonNote, 
+		IonRouterOutlet, 
+		IonSplitPane,
+
+	} from '@ionic/vue';
+	
+	import { 
+		archiveOutline, 
+		archiveSharp, 
+		bookmarkOutline, 
+		bookmarkSharp, 
+		heartOutline, 
+		heartSharp, 
+		mailOutline, 
+		mailSharp, 
+		paperPlaneOutline, 
+		paperPlaneSharp, 
+		trashOutline, 
+		trashSharp, 
+		warningOutline, 
+		warningSharp,
+
+	} from 'ionicons/icons';
 
 	import AuthModal from '@/components/AuthModal.vue';
 
@@ -46,12 +82,16 @@
 			IonSplitPane,
 		},
 		setup() {
+			const route	    = useRoute();
 			const isOpenRef = ref<boolean>(false);
-			const route = useRoute();
+			const vueApp    = getCurrentInstance();
+			const eventBus  = vueApp?.appContext.config.globalProperties.eventBus;
 			
 			isOpenRef.value = localStorage.getItem('token') === null;
 			
-			const closeModal = () => {
+			const closeModal = (event: any) => {
+				console.log('onCloseModal:', event);
+				
 				isOpenRef.value = false;
 			};
 
@@ -71,6 +111,12 @@
 					localStorage.setItem('theme', newColorScheme);
 
 					document.body.classList.toggle('dark', newColorScheme == 'dark');
+				});
+
+				eventBus.on('errorAuth', () => {
+					console.log('errorAuth');
+
+					isOpenRef.value = true;
 				});
 			});
 

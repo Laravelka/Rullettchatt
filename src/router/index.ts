@@ -12,9 +12,13 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/error',
 		component: () => import('@/views/Error.vue')
 	},
-	{
+	/*{
 		path: '/',
 		component: () => import ('@/views/Folder.vue')
+	},*/
+	{
+		path: '/',
+		component: () => import ('@/views/Home.vue')
 	}
 ];
 

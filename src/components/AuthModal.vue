@@ -92,7 +92,7 @@
 	} from 'ionicons/icons';
 
 	import axios from 'axios';
-	import { defineComponent, ref } from 'vue';
+	import { defineComponent, ref, getCurrentInstance } from 'vue';
 
 	export default defineComponent({
 		name: 'AuthModal',
@@ -117,12 +117,14 @@
 			IonCol,
 		},
 		setup(props, { emit }) {
+			const vueApp = getCurrentInstance();
 			const nameRef = ref(null);
 			const passwordRef = ref(null);
 			const errorMessage = ref(null);
 			const currentSegment = ref('auth');
 			const isLoadButtonRef = ref(false);
-
+			const eventBus = vueApp?.appContext.config.globalProperties.eventBus;
+			
 			const auth = () => {
 				isLoadButtonRef.value = true;
 
@@ -138,8 +140,9 @@
 					if (user.token) {
 						localStorage.setItem('token', user.token);
 						localStorage.setItem('user', JSON.stringify(user));
-
+						
 						emit('closeModal', true);
+						eventBus.emit('login', user);
 					}
 				}).catch((error) => {
 					const { response } = error;
@@ -172,10 +175,13 @@
 					isLoadButtonRef.value = false;
 
 					if (user.token) {
+						delete user.password;
+						
 						localStorage.setItem('token', user.token);
 						localStorage.setItem('user', JSON.stringify(user));
 						
 						emit('closeModal', true);
+						eventBus.emit('login', user);
 					}
 				}).catch((error) => {
 					const { response } = error;

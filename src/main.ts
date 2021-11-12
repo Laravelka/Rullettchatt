@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router';
 
+import mitt from 'mitt';
 import axios from 'axios';
 import { IonicVue } from '@ionic/vue';
 import { Device } from '@capacitor/device';
@@ -33,16 +34,20 @@ import './theme/variables.css';
 
 const token = localStorage.getItem('token') ?? false;
 
-axios.defaults.headers.common['SiteUrl'] = "http://localhost:5000/";
-
+axios.defaults.headers.common['SiteUrl'] = "http://localhost:5001/";
 axios.defaults.baseURL = axios.defaults.headers.common['SiteUrl'] + 'api/';
 axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+if (token) {
+	axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
 
 const app = createApp(App)
 	.use(IonicVue)
 	.use(router);
+
+app.config.globalProperties.eventBus = mitt();
 
 router.isReady().then(async() => {
 	const info = await Device.getInfo();
