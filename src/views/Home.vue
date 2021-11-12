@@ -240,11 +240,6 @@
 					};
 				} else {
 					video = {
-						width: { min: 240, ideal: 1280, max: 1920 },
-						height: { min: 240, ideal: 720, max: 1080 }
-					};
-
-					video = {
 						width: { min: 560, ideal: 1280, max: 1920 },
 						height: { min: 640, ideal: 720, max: 1080 }
 					};

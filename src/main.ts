@@ -34,7 +34,7 @@ import './theme/variables.css';
 
 const token = localStorage.getItem('token') ?? false;
 
-axios.defaults.headers.common['SiteUrl'] = "http://localhost:5001/";
+axios.defaults.headers.common['SiteUrl'] = "https://rulettchatt.ru/";
 axios.defaults.baseURL = axios.defaults.headers.common['SiteUrl'] + 'api/';
 axios.defaults.headers.common['Accept'] = 'application/json';
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
